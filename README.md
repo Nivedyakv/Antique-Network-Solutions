@@ -1,18 +1,49 @@
-# AntiqueNetworkSolution
+# Antique Network Solution
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.
+Welcome to the **Antique Network Solution** project! This application provides a modern and responsive user interface built for robust contact management and communication functionalities.
 
-## Development server
+## 📖 Overview
 
-To start a local development server, run:
+The Antique Network Solution is an intuitive and scalable web application that offers:
+- **Contact Management & Directory**: Create, view, and organize contacts with features like pagination and quick resets.
+- **Messaging Integration**: Compose and send messages using a streamlined, interactive custom user interface.
+- **Modern User Experience**: Features customized dialogs, dynamic layouts, and integrated scalable vector graphics (like Heroicons).
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before starting, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+- [Angular CLI](https://github.com/angular/angular-cli) (version 22+)
+
+### Installation
+
+1. Navigate to the project directory:
+   ```bash
+   cd Antique-Network-Solution
+   ```
+2. Install the necessary dependencies:
+   ```bash
+   npm install
+   ```
+
+### 🏃‍♂️ Startup Instructions
+
+To start the application and test the local development server using the production build configuration, run the following command:
 
 ```bash
-ng serve
+ng serve --configuration production
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Once the development server is up and running, open your browser and navigate to `http://localhost:4200/`.
 
-## Code scaffolding
+By running with `--configuration production`, you can ensure that you are locally previewing the application exactly as it would behave and perform in a live production environment.
+
+## 🛠️ Development & Build
+
+### Code Scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
@@ -20,40 +51,38 @@ Angular CLI includes powerful code scaffolding tools. To generate a new componen
 ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+For a complete list of available schematics (such as `directives`, `services`, or `pipes`), run `ng generate --help`.
 
-```bash
-ng generate --help
-```
+### Building the Project
 
-## Building
-
-To build the project run:
+To build the project for deployment, simply run:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
+## 🧪 Testing
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Unit Tests
+The project is configured to use [Vitest](https://vitest.dev/). Run unit testing by executing:
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
-
+### End-to-End Tests
 For end-to-end (e2e) testing, run:
 
 ```bash
 ng e2e
 ```
+*(Note: Angular CLI does not come with an E2E testing framework by default. Appropriate frameworks must be provided).*
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📚 Technology Stack
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **[Angular](https://angular.dev/)** - Core Framework (v22.2.0)
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework (v4.3.3)
+- **[Vitest](https://vitest.dev/)** - Testing framework
+- **[RxJS](https://rxjs.dev/)** - Additions for reactive programming
