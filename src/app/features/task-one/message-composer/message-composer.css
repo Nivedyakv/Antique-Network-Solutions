@@ -1,0 +1,133 @@
+:host {
+    display: block;
+}
+
+.field-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #d5ddeb;
+    border-radius: 4px;
+    background: white;
+    transition: border-color 150ms ease;
+}
+
+.field-input:focus-within {
+    border-color: #8056ff;
+    box-shadow: 0 0 0 1px #8056ff;
+}
+
+.picker-trigger {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: #f3f3f4;
+    color: #7c899e;
+    font-size: 12px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.picker-trigger:hover {
+    background: #ede9fe;
+}
+
+.picker-trigger.picker-active {
+    background: #8056ff !important;
+    color: white !important;
+}
+
+.coordinate-input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid #d5ddeb;
+    border-radius: 4px;
+    background: white;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.coordinate-input:focus {
+    border-color: #8056ff;
+    outline: 2px solid #8056ff;
+    outline-offset: 1px;
+}
+
+.field-invalid {
+    border-color: #dc2626;
+}
+
+.action-button {
+    display: flex;
+    flex: 1 1 145px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 150ms ease;
+}
+
+.tab-active {
+    color: #8056ff;
+    border-bottom-color: #8056ff;
+    font-weight: 600;
+}
+
+.picker-panel {
+    max-width: calc(100vw - 24px);
+}
+
+button {
+    cursor: pointer;
+}
+
+button:focus-visible {
+    outline: 2px solid #8056ff;
+    outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+    .action-button {
+        flex: 0 0 auto;
+        min-width: 175px;
+    }
+}
+
+.picker-panel {
+    overflow: visible;
+}
+
+.dropdown-arrow {
+    position: absolute;
+    top: -7px;
+    left: var(--arrow-x, 139px);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-top: 1px solid #dce5ff;
+    border-left: 1px solid #dce5ff;
+    transform: translateX(-50%) rotate(45deg);
+    pointer-events: none;
+}
+
+/* Panel opens ABOVE the trigger: arrow flips to bottom, pointing down */
+.picker-panel.above .dropdown-arrow {
+    top: auto;
+    bottom: -7px;
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid #dce5ff;
+    border-right: 1px solid #dce5ff;
+}

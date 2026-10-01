@@ -1,0 +1,276 @@
+<form #composerForm [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="space-y-[18px] bg-[#f1f5ff] p-3 sm:p-8">
+        @for (section of sections; track section.id) {
+        <section [attr.aria-labelledby]="'composer-' + section.id" class="rounded-[24px] bg-white px-4 py-8 sm:px-8">
+            <h2 [id]="'composer-' + section.id" class="mb-4 text-base font-semibold text-[#333333]">
+                {{ section.title }}
+            </h2>
+
+            <div class="space-y-5">
+                @for (field of section.fields; track field.key) {
+                <div class="w-full max-w-[435px]">
+                    <!-- Label and counter -->
+                    <div class="mb-1.5 flex items-center justify-between gap-3">
+                        <label [for]="field.key" class="min-w-0 text-sm font-medium text-[#333333]">
+                            {{ field.label }}
+
+                            @if (field.info) {
+                            <span class="ml-1 inline-flex size-3.5 items-center
+                             justify-center rounded-full border
+                             border-[#7970bd] text-[10px]
+                             text-[#7970bd]" [title]="field.info">
+                                i
+                            </span>
+                            }
+                        </label>
+
+                        @if (!field.key.startsWith('variable')) {
+                        <span class="shrink-0 text-[11px] text-[#8b99af]">
+                            {{ textControl(field.key).value.length }}/{{ field.max }}
+                        </span>
+                        }
+                    </div>
+
+                    <!-- Input and picker controls -->
+                    <div class="field-input" [class.field-invalid]="showError(field.key)">
+                        <input [id]="field.key" [formControlName]="field.key" [placeholder]="field.placeholder"
+                            [maxlength]="field.max" [attr.aria-invalid]="showError(field.key)"
+                            [attr.aria-describedby]="field.key + '-help'" class="min-w-0 flex-1 bg-transparent text-[13px]
+                         text-[#333333] outline-none
+                         placeholder:text-[#8b99af]" (click)="remember($event)" (keyup)="remember($event)"
+                            (select)="remember($event)" (input)="remember($event)" />
+
+                        @if (field.emoji) {
+                        <button type="button" class="picker-trigger"
+                            [attr.aria-label]="'Choose emoji for ' + field.label" [attr.aria-expanded]="
+                      picker()?.key === field.key &&
+                      picker()?.kind === 'emoji'
+                    " aria-haspopup="dialog" (click)="openPicker(field.key, 'emoji', $event)">
+                            <!-- Heroicons: face-smile (outline) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="size-4" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+                            </svg>
+                        </button>
+                        }
+
+                        <button type="button" class="picker-trigger" [class.picker-active]="
+                    picker()?.key === field.key &&
+                    picker()?.kind === 'variable'
+                  " [attr.aria-label]="'Choose variable for ' + field.label" [attr.aria-expanded]="
+                    picker()?.key === field.key &&
+                    picker()?.kind === 'variable'
+                  " aria-haspopup="dialog" (click)="openPicker(field.key, 'variable', $event)">
+                            {{ braces }}
+                        </button>
+                    </div>
+
+                    <!-- Helper and error -->
+                    <div [id]="field.key + '-help'" class="mt-1.5 text-[11px] leading-[17px] text-[#5b6987]">
+                        @if (field.helper) {
+                        <p>{{ field.helper }}</p>
+                        }
+
+                        @if (showError(field.key)) {
+                        <p class="mt-1 text-red-600">
+                            {{ errorMessage(field) }}
+                        </p>
+                        }
+                    </div>
+                </div>
+                }
+
+                <!-- Coordinates belong to the Header card -->
+                @if (section.id === 'header') {
+                <div class="grid w-full max-w-[572px]
+                     grid-cols-1 gap-4 sm:grid-cols-2">
+                    @for (coordinate of coordinates; track coordinate.key) {
+                    <div class="min-w-0">
+                        <label [for]="coordinate.key" class="mb-1.5 block text-xs font-medium">
+                            {{ coordinate.label }}
+                        </label>
+
+                        <input [id]="coordinate.key" type="number" inputmode="decimal" step="any" [min]="coordinate.min"
+                            [max]="coordinate.max" [formControlName]="coordinate.key" class="coordinate-input"
+                            [class.field-invalid]="showError(coordinate.key)"
+                            [attr.aria-invalid]="showError(coordinate.key)"
+                            [attr.aria-describedby]="coordinate.key + '-help'" />
+
+                        <div [id]="coordinate.key + '-help'" class="mt-1.5 text-[10px] leading-[17px]
+                           text-[#5b6987]">
+                            <p>{{ coordinate.helper }}</p>
+
+                            @if (showError(coordinate.key)) {
+                            <p class="mt-1 text-red-600">
+                                Enter a number between
+                                {{ coordinate.min }} and {{ coordinate.max }}.
+                            </p>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </section>
+        }
+    </div>
+
+    <!-- Actions -->
+    <footer class="flex flex-wrap justify-end gap-3 border-t
+           border-[#e7edff] bg-white px-4 py-4 sm:px-6">
+        <button type="button" (click)="reset()" class="action-button border border-[#8056ff]
+             text-[#8056ff] hover:bg-violet-50">
+            Cancel
+            <!-- Rounded-square X icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="size-4" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="4" ry="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l6 6M15 9l-6 6" />
+            </svg>
+        </button>
+
+        <button type="submit" class="action-button bg-[#8056ff]
+             text-white hover:bg-[#7047ed]">
+            Done composing
+            <!-- Rounded-square check icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="size-4" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="4" ry="4" stroke-linecap="round" stroke-linejoin="round" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 12.5l3 3 4-5" />
+            </svg>
+        </button>
+    </footer>
+</form>
+
+<!-- Variable or emoji picker -->
+@if (picker(); as active) {
+<div #pickerPanel role="dialog" [attr.aria-label]="
+      active.kind === 'variable'
+        ? 'Choose an attribute'
+        : 'Choose an emoji'
+    " class="picker-panel absolute z-30 w-[242px]
+           rounded-xl border border-[#dce5ff]
+           bg-white shadow-lg" [class.above]="active.above" [style.left.px]="active.left" [style.top.px]="active.top"
+    [style.--arrow-x.px]="active.arrowLeft">
+    <span class="dropdown-arrow" aria-hidden="true"></span>
+    @if (active.kind === 'variable') {
+    <div class="p-3 pb-1">
+        <label for="attribute-search" class="sr-only">
+            Search attributes
+        </label>
+
+        <div class="flex items-center gap-1.5 rounded
+                 border border-[#d5ddeb] px-2">
+            <svg class="size-3.5 shrink-0 text-[#8b99af]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" aria-hidden="true">
+                <circle cx="10" cy="10" r="6" />
+                <path d="m15 15 5 5" />
+            </svg>
+
+            <input id="attribute-search" type="search" [value]="query()" (input)="query.set($any($event.target).value)"
+                [placeholder]="'Search ' + category() + ' Attributes'" class="h-7 w-full min-w-0 text-[10px]
+                   outline-none placeholder:text-[#8b99af]" />
+        </div>
+    </div>
+
+    <div role="group" aria-label="Attribute category" class="flex border-b border-[#dce5ff] px-3">
+        @for (item of categories; track item) {
+        <button type="button" (click)="category.set(item)" [attr.aria-pressed]="category() === item"
+            [class.tab-active]="category() === item" class="border-b-2 border-transparent
+                   px-4 py-2 text-[11px] text-[#5b6987]">
+            {{ item }}
+        </button>
+        }
+    </div>
+
+    <div class="max-h-[204px] overflow-y-auto pb-2">
+        @for (
+        attribute of filteredAttributes();
+        track attribute.token
+        ) {
+        <button type="button" (click)="insert('{{' + attribute.token + '}}')" class="flex w-full items-center gap-2
+                   border-b border-[#dce5ff]
+                   px-3 py-2 text-left text-[10px]
+                   text-[#8491a8] hover:bg-[#f1f5ff]
+                   hover:text-[#8056ff]">
+            <span class="text-xs">{{ braces }}</span>
+            {{ attribute.label }}
+        </button>
+        } @empty {
+        <p class="px-3 py-4 text-xs text-[#5b6987]">
+            No attributes found.
+        </p>
+        }
+    </div>
+    } @else {
+    <div class="flex items-center justify-between px-3 pt-3">
+        <p class="text-xs font-medium">Choose an emoji</p>
+
+        <button type="button" aria-label="Close emoji picker" (click)="closePicker()" class="px-1 text-sm">
+            ×
+        </button>
+    </div>
+
+    <div class="grid grid-cols-6 gap-1 p-3">
+        @for (emoji of emojis; track emoji) {
+        <button type="button" [attr.aria-label]="'Insert ' + emoji" (click)="insert(emoji)"
+            class="rounded p-1 text-xl hover:bg-violet-50">
+            {{ emoji }}
+        </button>
+        }
+    </div>
+    }
+</div>
+}
+
+<!-- Notification -->
+@if (notice()) {
+<div role="status" aria-live="polite" class="fixed right-4 top-5 z-40 flex
+           max-w-[calc(100vw-32px)] items-center gap-4
+           rounded-xl border border-[#dce5ff]
+           bg-white px-4 py-3 text-sm shadow-lg">
+    <p>{{ notice() }}</p>
+
+    <button type="button" aria-label="Dismiss notification" (click)="notice.set('')" class="text-[#8056ff]">
+        ×
+    </button>
+</div>
+}
+
+<!-- Local draft preview -->
+@if (previewRows(); as rows) {
+<div class="fixed inset-0 z-50 grid place-items-center
+           bg-slate-900/30 p-4" (click)="closePreview()">
+    <section #previewPanel role="dialog" aria-modal="true" aria-labelledby="draft-preview-title" class="max-h-[80vh] w-full max-w-lg overflow-y-auto
+             rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+        <h2 id="draft-preview-title" class="text-xl font-semibold">
+            Message composed
+        </h2>
+
+        <p class="mt-2 text-sm text-[#5b6987]">
+            Your draft is ready. This preview does not send a message.
+        </p>
+
+        <dl class="mt-5 space-y-3">
+            @for (row of rows; track row.label) {
+            <div>
+                <dt class="text-xs text-[#5b6987]">
+                    {{ row.label }}
+                </dt>
+
+                <dd class="break-words text-sm">
+                    {{ row.value === null || row.value === '' ? '—' : row.value }}
+                </dd>
+            </div>
+            }
+        </dl>
+
+        <button type="button" (click)="closePreview()" class="mt-6 rounded-full bg-[#8056ff]
+               px-6 py-2 text-sm text-white hover:bg-[#7047ed]">
+            Back to composer
+        </button>
+    </section>
+</div>
+}

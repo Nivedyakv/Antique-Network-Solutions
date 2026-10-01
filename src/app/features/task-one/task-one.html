@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-[#fbfcff] m-4">
+    <app-breadcrumb [items]="breadcrumbs" />
+
+    <main class="overflow-hidden rounded-t-[32px]
+           border border-[#e7edff] bg-white">
+        <!-- Back button, title and subtitle -->
+        <header class="flex items-start gap-3
+             border-b border-[#e7edff]
+             px-4 py-6
+             sm:items-center sm:px-8">
+            <a routerLink="/" aria-label="Back to Home" class="grid h-10 w-[34px] shrink-0 place-items-center
+               rounded-lg border border-[#b39aff]
+               text-[#8056ff] transition-colors
+               hover:bg-violet-50
+               focus-visible:outline-2
+               focus-visible:outline-offset-4
+               focus-visible:outline-[#8056ff]">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    aria-hidden="true">
+                    <path d="m14 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </a>
+
+            <div class="min-w-0">
+                <h1 class="text-xl font-semibold leading-tight
+                 tracking-[-0.5px] text-[#333333]
+                 sm:text-[23px]">
+                    Customize Your Message
+                </h1>
+
+                <p class="mt-1 text-xs leading-5 text-[#5b6987]">
+                    Fill in the required details based on your selected
+                    template to complete the message setup.
+                </p>
+            </div>
+        </header>
+
+        <!-- Template information -->
+        <section aria-label="Selected template details">
+            <dl class="grid grid-cols-2 gap-x-6 gap-y-4
+               px-4 py-3
+               sm:flex sm:flex-wrap sm:gap-x-12 sm:px-8">
+                @for (detail of templateDetails; track detail.label) {
+                <div class="min-w-0">
+                    <dt class="text-[11px] font-medium text-[#5b6987]">
+                        {{ detail.label }}
+                    </dt>
+
+                    <dd class="mt-1 break-words text-[13px] text-[#333333]">
+                        {{ detail.value }}
+                    </dd>
+                </div>
+                }
+            </dl>
+        </section>
+        <app-message-composer />
+    </main>
+</div>

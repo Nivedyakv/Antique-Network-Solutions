@@ -1,0 +1,381 @@
+<div class="min-h-screen bg-[#fbfcff] m-4">
+    <app-breadcrumb [items]="breadcrumbs" />
+
+    <main class="overflow-hidden rounded-t-[32px]
+           border border-[#e7edff] bg-white">
+        <!-- Back button, title and subtitle -->
+        <header class="flex items-start gap-3
+             border-b border-[#e7edff]
+             px-4 py-6
+             sm:items-center sm:px-8">
+            <a routerLink="/" aria-label="Back to Home" class="grid h-10 w-[34px] shrink-0 place-items-center
+               rounded-lg border border-[#b39aff]
+               text-[#8056ff] transition-colors
+               hover:bg-violet-50
+               focus-visible:outline-2
+               focus-visible:outline-offset-4
+               focus-visible:outline-[#8056ff]">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                    aria-hidden="true">
+                    <path d="m14 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </a>
+
+            <div class="min-w-0">
+                <h1 class="text-xl font-semibold leading-tight
+                 tracking-[-0.5px] text-[#333333]
+                 sm:text-[23px]">
+                    Manage your contacts
+                </h1>
+
+                <p class="mt-1 text-xs leading-5 text-[#5b6987]">
+                    Create, browse and update your contact records.
+                </p>
+            </div>
+        </header>
+
+        <div class="px-4 py-6 sm:px-8 lg:px-12">
+            <div class="mx-auto max-w-[1440px]">
+
+                <div class="mb-7 grid grid-cols-3 gap-3">
+                    <div class="stat">
+                        <p>Total contacts</p>
+                        <strong>{{ contacts().length }}</strong>
+                    </div>
+                    <div class="stat">
+                        <p>Active</p>
+                        <strong>{{ activeCount() }}</strong>
+                    </div>
+                    <div class="stat">
+                        <p>Inactive</p>
+                        <strong>{{ contacts().length - activeCount() }}</strong>
+                    </div>
+                </div>
+
+                @if (notice(); as message) {
+                <div class="notice mb-5" [class.notice-error]="message.type === 'error'" role="status"
+                    aria-live="polite">
+                    <span>{{ message.text }}</span>
+                    <button type="button" aria-label="Dismiss notification" (click)="notice.set(null)">
+                        ×
+                    </button>
+                </div>
+                }
+
+                <div class="grid items-start gap-6 xl:grid-cols-[480px_minmax(0,1fr)]">
+                    <section #editor class="panel scroll-mt-5" aria-labelledby="editor-title"
+                        [attr.aria-busy]="saving() || loadingDetail()">
+                        <div class="mb-6 flex items-start justify-between gap-3">
+                            <div>
+                                <p class="mb-1 text-xs font-medium uppercase tracking-wider text-violet-600">
+                                    {{ mode() === 'create' ? 'New record' : 'Contact #' + selectedId() }}
+                                </p>
+                                <h2 id="editor-title" class="text-xl font-semibold">
+                                    {{ mode() === 'create' ? 'Create contact' : mode() === 'edit' ? 'Edit contact' :
+                                    'Contact
+                                    details' }}
+                                </h2>
+                                <p class="mt-2 text-xs text-slate-500">
+                                    {{ mode() === 'view' ? 'Read-only contact information.' : 'All fields are required.
+                                    Choose
+                                    either active or inactive.' }}
+                                </p>
+                            </div>
+                            <button type="button" class="primary-button shrink-0" (click)="newContact()"
+                                [disabled]="mutationPending()">
+                                + New contact
+                            </button>
+                        </div>
+
+                        @if (loadingDetail()) {
+                        <p role="status" class="mb-4 flex items-center gap-2 text-sm text-violet-600">
+                            <span class="spinner"></span>
+                            Fetching contact details…
+                        </p>
+                        }
+
+                        <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+                            <fieldset [disabled]="mode() === 'view' || saving() || loadingDetail()"
+                                class="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                                @for (field of textFields; track field.key) {
+                                <div class="min-w-0" [class.sm:col-span-2]="field.key === 'emailId'">
+                                    <label [for]="'contact-' + field.key" class="field-label">
+                                        {{ field.label }} <span aria-hidden="true">*</span>
+                                    </label>
+                                    <input [id]="'contact-' + field.key" [type]="field.type"
+                                        [autocomplete]="field.autocomplete" [maxlength]="field.max"
+                                        [placeholder]="field.placeholder" [formControlName]="field.key"
+                                        [attr.inputmode]="field.key === 'adhaar_no' ? 'numeric' : null"
+                                        class="form-input" [class.input-invalid]="showError(field.key)"
+                                        [attr.aria-invalid]="showError(field.key)"
+                                        [attr.aria-describedby]="field.key + '-error'" />
+                                    <p [id]="field.key + '-error'" class="field-error">
+                                        @if (showError(field.key)) {
+                                        {{ fieldError(field.key) }}
+                                        }
+                                    </p>
+                                </div>
+                                }
+
+                                <div>
+                                    <label for="contact-age" class="field-label">
+                                        Age <span aria-hidden="true">*</span>
+                                    </label>
+                                    <input id="contact-age" type="number" min="1" max="120" step="1" inputmode="numeric"
+                                        formControlName="age" placeholder="Age" class="form-input"
+                                        [class.input-invalid]="showError('age')" [attr.aria-invalid]="showError('age')"
+                                        aria-describedby="age-error" />
+                                    <p id="age-error" class="field-error">
+                                        @if (showError('age')) {
+                                        {{ fieldError('age') }}
+                                        }
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label for="contact-gender" class="field-label">
+                                        Gender <span aria-hidden="true">*</span>
+                                    </label>
+                                    <select id="contact-gender" formControlName="gender" class="form-input"
+                                        [class.input-invalid]="showError('gender')"
+                                        [attr.aria-invalid]="showError('gender')" aria-describedby="gender-error">
+                                        <option value="" disabled>Select gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <p id="gender-error" class="field-error">
+                                        @if (showError('gender')) {
+                                        {{ fieldError('gender') }}
+                                        }
+                                    </p>
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label for="contact-created" class="field-label">
+                                        Created date <span aria-hidden="true">*</span>
+                                    </label>
+                                    <input id="contact-created" type="date" [max]="today" formControlName="createdAt"
+                                        class="form-input" [class.input-invalid]="showError('createdAt')"
+                                        [attr.aria-invalid]="showError('createdAt')"
+                                        aria-describedby="createdAt-error" />
+                                    <p id="createdAt-error" class="field-error">
+                                        @if (showError('createdAt')) {
+                                        {{ fieldError('createdAt') }}
+                                        }
+                                    </p>
+                                </div>
+
+                                <div
+                                    class="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4 sm:col-span-2">
+                                    <div>
+                                        <label for="contact-status" class="text-sm font-medium">Active contact</label>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            Uncheck to mark this contact inactive.
+                                        </p>
+                                    </div>
+                                    <input id="contact-status" type="checkbox" formControlName="status"
+                                        class="size-5 accent-violet-600" />
+                                </div>
+                            </fieldset>
+
+                            <div class="mt-6 flex flex-wrap gap-3 border-t border-slate-100 pt-5">
+                                @if (mode() !== 'view') {
+                                <button type="submit" class="primary-button flex-1" [disabled]="busy()">
+                                    {{ saving() ? 'Saving…' : mode() === 'edit' ? 'Save changes' : 'Create contact' }}
+                                </button>
+                                }
+                                <button type="button" class="secondary-button" (click)="newContact()"
+                                    [disabled]="mutationPending()">
+                                    {{ mode() === 'create' ? 'Clear form' : 'New contact' }}
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                    <section class="panel" aria-labelledby="directory-title" [attr.aria-busy]="loading()">
+                        <div class="mb-5 flex items-center justify-between gap-3">
+                            <h2 id="directory-title" class="text-lg font-semibold">
+                                Contact directory <span class="ml-1 text-sm font-normal text-slate-400">({{
+                                    filtered().length
+                                    }})</span>
+                            </h2>
+                            <button type="button" class="secondary-button" (click)="loadContacts()" [disabled]="busy()">
+                                {{ loading() ? 'Loading…' : 'Refresh' }}
+                            </button>
+                        </div>
+
+                        <div class="mb-5 flex flex-col gap-3 sm:flex-row">
+                            <div class="min-w-0 flex-1">
+                                <label for="contact-search" class="sr-only">Search contacts</label>
+                                <input id="contact-search" type="search" placeholder="Search name, email or phone"
+                                    [value]="search()" (input)="setSearch($any($event.target).value)"
+                                    class="form-input" />
+                            </div>
+
+                            <div>
+                                <label for="status-filter" class="sr-only">Filter by status</label>
+                                <select id="status-filter" [value]="statusFilter()"
+                                    (change)="setStatus($any($event.target).value)" class="form-input">
+                                    <option value="all">All statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        @if (loadError()) {
+                        <div role="alert" class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+                            {{ loadError() }}
+                            <button type="button" class="ml-1 underline" (click)="loadContacts()" [disabled]="busy()">
+                                Retry
+                            </button>
+                        </div>
+                        }
+
+                        @if (loading()) {
+                        <div role="status"
+                            class="grid min-h-52 place-content-center gap-3 text-center text-sm text-slate-500">
+                            <span class="spinner mx-auto"></span>
+                            Loading contacts…
+                        </div>
+                        }
+                        @else if (contacts().length === 0 && !loadError()) {
+                        <div class="empty-state">
+                            <h3>No contacts yet</h3>
+                            <p>Create your first contact using the form.</p>
+                        </div>
+                        }
+                        @else if (filtered().length === 0 && contacts().length > 0) {
+                        <div class="empty-state">
+                            <h3>No matching contacts</h3>
+                            <p>Try another search or status filter.</p>
+                            <button type="button" class="secondary-button mt-4"
+                                (click)="setSearch(''); setStatus('all')">
+                                Clear filters
+                            </button>
+                        </div>
+                        }
+                        @else {
+                        <div class="space-y-3">
+                            @for (contact of visibleContacts(); track contact.id) {
+                            <article class="contact-card" [class.selected-card]="selectedId() === contact.id">
+                                <div class="flex items-start gap-3">
+                                    <div class="avatar" aria-hidden="true">
+                                        {{ contact.first_name.charAt(0) }}{{ contact.last_name.charAt(0) }}
+                                    </div>
+
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <h3 class="break-words font-semibold">
+                                                {{ contact.first_name }} {{ contact.last_name }}
+                                            </h3>
+                                            <span class="status-badge" [class.status-inactive]="!contact.status">
+                                                {{ contact.status ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </div>
+                                        <p class="mt-1 break-all text-xs text-slate-500">
+                                            {{ contact.emailId }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-slate-500">
+                                            {{ contact.mobilenumber }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
+                                    <span class="break-all text-[11px] text-slate-400">
+                                        ID: {{ contact.id }}
+                                    </span>
+                                    <div class="flex gap-2">
+                                        <button type="button" class="row-action" (click)="openContact(contact, 'view')"
+                                            [disabled]="loading() || mutationPending()">
+                                            View
+                                        </button>
+                                        <button type="button" class="row-action" (click)="openContact(contact, 'edit')"
+                                            [disabled]="loading() || mutationPending()">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="row-action text-red-600"
+                                            (click)="askDelete(contact)" [disabled]="busy()">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                            }
+                        </div>
+
+                        @if (filtered().length > pageSize) {
+                        <nav aria-label="Contact list pagination"
+                            class="mt-5 flex items-center justify-between gap-3 text-xs text-slate-500">
+                            <button type="button" class="secondary-button" (click)="page.set(currentPage() - 1)"
+                                [disabled]="currentPage() === 1">
+                                Previous
+                            </button>
+                            <span>Page {{ currentPage() }} of {{ pageCount() }}</span>
+                            <button type="button" class="secondary-button" (click)="page.set(currentPage() + 1)"
+                                [disabled]="currentPage() === pageCount()">
+                                Next
+                            </button>
+                        </nav>
+                        }
+                        }
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<dialog #deleteDialog (cancel)="onDialogCancel($event)" aria-labelledby="delete-title"
+    aria-describedby="delete-description" class="delete-dialog">
+    <h2 id="delete-title" class="text-xl font-semibold">Delete contact?</h2>
+    <p id="delete-description" class="mt-3 break-words text-sm leading-6 text-slate-500">
+        Delete {{ deleteTarget()?.first_name }} {{ deleteTarget()?.last_name }}? This action cannot be undone.
+    </p>
+
+    @if (deleteError()) {
+    <p role="alert" class="mt-4 text-sm text-red-600">
+        {{ deleteError() }}
+    </p>
+    }
+
+    <div class="mt-6 flex justify-end gap-3">
+        <button type="button" class="secondary-button" (click)="closeDelete()" [disabled]="deletingId() !== null">
+            Cancel
+        </button>
+        <button type="button" class="primary-button !bg-red-600 hover:!bg-red-700" (click)="confirmDelete()"
+            [disabled]="deletingId() !== null">
+            {{ deletingId() ? 'Deleting…' : 'Delete contact' }}
+        </button>
+    </div>
+</dialog>
+
+<dialog #discardDialog (cancel)="onDiscardDialogCancel($event)" aria-labelledby="discard-title"
+    aria-describedby="discard-description" class="delete-dialog">
+    <div class="mb-4 flex items-center gap-3">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-100" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-amber-600" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </span>
+        <h2 id="discard-title" class="text-xl font-semibold">Discard changes?</h2>
+    </div>
+    <p id="discard-description" class="mt-1 break-words text-sm leading-6 text-slate-500">
+        You have unsaved changes in the form. If you continue, your changes will be permanently lost.
+    </p>
+
+    <div class="mt-6 flex justify-end gap-3">
+        <button type="button" class="secondary-button" (click)="closeDiscard()">
+            Keep editing
+        </button>
+        <button type="button" class="primary-button !bg-amber-600 hover:!bg-amber-700" (click)="confirmDiscard()">
+            Discard changes
+        </button>
+    </div>
+</dialog>

@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+@theme {
+    --color-brand: #591cc7;
+    --color-page: #f1f5ff;
+}
+
+/* Reduce CLS: match Arial (fallback) metrics to Poppins as closely as possible */
+@font-face {
+    font-family: 'Poppins';
+    src: local('Arial');
+    size-adjust: 105%;
+    ascent-override: 93%;
+    descent-override: 30%;
+    line-gap-override: 0%;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+}

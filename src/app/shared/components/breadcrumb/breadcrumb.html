@@ -1,0 +1,25 @@
+<nav aria-label="Breadcrumb" class="flex min-h-[100px] items-center px-4 sm:px-8">
+    <ol class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+        @for (item of items(); track $index; let last = $last) {
+        <li class="flex items-center gap-3">
+            @if (item.route && !last) {
+            <a [routerLink]="item.route" class="text-[#5c6885] transition-colors hover:text-[#8056ff]">
+                {{ item.label }}
+            </a>
+            } @else {
+            <span [attr.aria-current]="last ? 'page' : null" [class.text-slate-800]="last"
+                [class.text-slate-500]="!last">
+                {{ item.label }}
+            </span>
+            }
+
+            @if (!last) {
+            <svg class="size-4 shrink-0 text-[#5c6885]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8" aria-hidden="true">
+                <path d="m9 5 7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            }
+        </li>
+        }
+    </ol>
+</nav>
