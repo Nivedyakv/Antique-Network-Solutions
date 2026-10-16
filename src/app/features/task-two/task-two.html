@@ -136,7 +136,8 @@
                                     <label for="contact-gender" class="field-label">
                                         Gender <span aria-hidden="true">*</span>
                                     </label>
-                                    <select id="contact-gender" formControlName="gender" class="form-input"
+                                    <select id="contact-gender" formControlName="gender"
+                                        class="block w-full rounded-lg border border-slate-300 bg-slate-100 px-3 py-2.5 text-sm text-slate-900 shadow-xs focus:border-brand focus:ring-2 focus:ring-brand"
                                         [class.input-invalid]="showError('gender')"
                                         [attr.aria-invalid]="showError('gender')" aria-describedby="gender-error">
                                         <option value="" disabled>Select gender</option>

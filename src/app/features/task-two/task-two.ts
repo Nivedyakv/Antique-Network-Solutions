@@ -147,7 +147,7 @@ export class TaskTwo {
       Validators.min(1),
       Validators.max(120),
     ]),
-    gender: this.fb.nonNullable.control('', [
+    gender: this.fb.nonNullable.control('Male', [
       Validators.required,
       Validators.pattern(/^(Male|Female|Other)$/),
     ]),
